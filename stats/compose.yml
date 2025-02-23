@@ -7,10 +7,10 @@ services:
     environment:
       - JAVA_OPTS=-Duser.timezone=UTC
     depends_on:
-      db:
+      stats-db:
         condition: service_healthy
 
-  db:
+  stats-db:
     image: postgres:16
     environment:
       POSTGRES_USER: sa
