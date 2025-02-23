@@ -32,3 +32,6 @@ services:
 
   ewm-db:
     image: postgres:16.1
+
+volumes:
+  postgres-data:
