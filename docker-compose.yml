@@ -1,10 +1,30 @@
 services:
   stats-server:
+    build: stats/stats-server
+    image: stats-server
     ports:
       - "9090:9090"
+    environment:
+      - JAVA_OPTS=-Duser.timezone=UTC
+    depends_on:
+      stats-db:
+        condition: service_healthy
 
   stats-db:
-    image: postgres:16.1
+    image: postgres:16
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sa
+      POSTGRES_DB: stats
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
   ewm-service:
     ports:
