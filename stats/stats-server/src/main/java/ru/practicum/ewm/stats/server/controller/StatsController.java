@@ -30,7 +30,7 @@ public class StatsController {
     public ResponseEntity<List<ViewStats>> getStats(@RequestParam @NonNull String start,
                                                     @RequestParam @NonNull String end,
                                                     @RequestParam(required = false, defaultValue = "") List<String> uris,
-                                                    @RequestParam(defaultValue = "false") Boolean unique ) {
+                                                    @RequestParam(defaultValue = "false") Boolean unique) {
         List<ViewStats> results = service.getViews(start, end, uris, unique);
         return ResponseEntity.ok(results);
     }

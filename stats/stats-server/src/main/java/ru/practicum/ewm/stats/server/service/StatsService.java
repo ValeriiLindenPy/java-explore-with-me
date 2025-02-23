@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface StatsService {
     void addHit(@Valid EndpointHit hit);
+
     List<ViewStats> getViews(@NonNull String start, @NonNull String end, List<String> uris, Boolean unique);
 }
