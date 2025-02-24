@@ -1,6 +1,5 @@
 package ru.practicum.ewm.stats.server.service.impl;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.EndpointHit;
@@ -11,7 +10,6 @@ import ru.practicum.ewm.stats.server.service.HitMapper;
 import ru.practicum.ewm.stats.server.service.StatsService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -26,7 +24,6 @@ public class StatServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getViews(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-
         List<String> processedUris = (uris != null) ? uris : List.of();
 
         if (start.isAfter(end)) {
