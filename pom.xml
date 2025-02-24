@@ -13,9 +13,7 @@
 	<name>Explore With Me</name>
     <modules>
         <module>stats</module>
-		<module>stats/stats-dto</module>
-		<module>stats/stats-client</module>
-		<module>stats/stats-server</module>
+		<module>ewm-service</module>
 	</modules>
 
     <groupId>ru.practicum</groupId>
@@ -27,6 +25,27 @@
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.36</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>2.18.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.7.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<pluginManagement>

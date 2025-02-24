@@ -13,11 +13,13 @@ import ru.practicum.stats.client.StatsClient;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class StatsClientImpl implements StatsClient {
     private final RestTemplate rest;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
@@ -39,9 +41,11 @@ public class StatsClientImpl implements StatsClient {
 
     @Override
     public ResponseEntity<Object> getViewStats(@NonNull String start, @NonNull String end, @Nullable List<String> uris, @Nullable Boolean unique) {
+        LocalDateTime parsedStart = LocalDateTime.parse(start, FORMATTER);
+        LocalDateTime parsedEnd = LocalDateTime.parse(end, FORMATTER);
 
-        String encodedStart = URLEncoder.encode(start, StandardCharsets.UTF_8);
-        String encodedEnd = URLEncoder.encode(end, StandardCharsets.UTF_8);
+        String encodedStart = URLEncoder.encode(FORMATTER.format(parsedStart), StandardCharsets.UTF_8);
+        String encodedEnd = URLEncoder.encode(FORMATTER.format(parsedEnd), StandardCharsets.UTF_8);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/stats")
                 .queryParam("start", encodedStart)

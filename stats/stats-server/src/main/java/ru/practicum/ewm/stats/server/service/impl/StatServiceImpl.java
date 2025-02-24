@@ -25,24 +25,22 @@ public class StatServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStats> getViews(@NonNull String start, @NonNull String end, List<String> uris, Boolean unique) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime startDateTime = LocalDateTime.parse(start, formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
+    public List<ViewStats> getViews(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+
         List<String> processedUris = (uris != null) ? uris : List.of();
 
-        if (startDateTime.isAfter(endDateTime)) {
+        if (start.isAfter(end)) {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 
         if (unique) {
             return processedUris.isEmpty()
-                    ? getUniqueStats(startDateTime, endDateTime)
-                    : getUniqueStatsByUris(startDateTime, endDateTime, processedUris);
+                    ? getUniqueStats(start, end)
+                    : getUniqueStatsByUris(start, end, processedUris);
         } else {
             return processedUris.isEmpty()
-                    ? getAllStats(startDateTime, endDateTime)
-                    : getStatsByUris(startDateTime, endDateTime, processedUris);
+                    ? getAllStats(start, end)
+                    : getStatsByUris(start, end, processedUris);
         }
     }
 
