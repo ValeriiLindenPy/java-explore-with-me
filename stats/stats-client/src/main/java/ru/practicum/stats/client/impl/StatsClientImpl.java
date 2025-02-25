@@ -1,8 +1,5 @@
 package ru.practicum.stats.client.impl;
 
-
-import jakarta.annotation.Nullable;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -40,7 +37,7 @@ public class StatsClientImpl implements StatsClient {
     }
 
     @Override
-    public ResponseEntity<Object> getViewStats(@NonNull String start, @NonNull String end, @Nullable List<String> uris, @Nullable Boolean unique) {
+    public ResponseEntity<Object> getViewStats(String start, String end, List<String> uris, Boolean unique) {
         LocalDateTime parsedStart = LocalDateTime.parse(start, FORMATTER);
         LocalDateTime parsedEnd = LocalDateTime.parse(end, FORMATTER);
 
