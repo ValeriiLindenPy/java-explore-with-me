@@ -6,11 +6,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.model.dto.ApiError;
-
 import java.time.LocalDateTime;
-
 import static org.springframework.http.HttpStatus.*;
-
 
 @RestControllerAdvice
 public class GlobalAdviceController {

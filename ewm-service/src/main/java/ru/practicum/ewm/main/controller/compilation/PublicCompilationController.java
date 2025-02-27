@@ -1,5 +1,4 @@
-package ru.practicum.ewm.main.controller;
-
+package ru.practicum.ewm.main.controller.compilation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
