@@ -62,7 +62,7 @@ public class CompilationServiceImpl implements CompilationService {
 
         List<Event> events = eventRepository.findByIdIn(uniqueEvents);
 
-        if (uniqueEvents.size() != events.size()){
+        if (uniqueEvents.size() != events.size()) {
             throw new NotFoundException("One or more events where not found");
         }
 
@@ -78,47 +78,45 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto update(Long compId, UpdateCompilationRequest compilation) {
-        try {
-            Compilation oldCompilation = compilationRepository.getReferenceById(compId);
-            if(compilation.getPinned() != oldCompilation.getPinned()) {
-                oldCompilation.setPinned(compilation.getPinned());
-            }
+        Compilation oldCompilation = compilationRepository.findById(compId).orElseThrow(
+                () -> new NotFoundException("Compilation with id=%d was not found".formatted(compId))
+        );
 
-            List<Long> uniqueEvents = Optional.ofNullable(compilation.getEvents())
-                    .orElse(List.of())
-                    .stream()
-                    .distinct()
-                    .toList();
-
-            List<Event> eventsList = eventRepository.findByIdIn(uniqueEvents);
-
-            if (uniqueEvents.size() != eventsList.size()){
-                throw new NotFoundException("One or more events where not found");
-            }
-
-            Set<Event> events = new HashSet<>(eventsList);
-            Set<Event> oldEvents = new HashSet<>(oldCompilation.getEvents());
-
-            if(!oldEvents.equals(events)) {
-                oldCompilation.setEvents(eventsList);
-            }
-
-            if (!oldCompilation.getTitle().equals(compilation.getTitle())) {
-                oldCompilation.setTitle(compilation.getTitle());
-            }
-
-            return CompilationMapper.toDto(compilationRepository.save(oldCompilation));
-
-        }catch (EntityNotFoundException ex) {
-            throw new NotFoundException("Compilation with id=%d was not found".formatted(compId));
+        if (compilation.getPinned() != oldCompilation.getPinned()) {
+            oldCompilation.setPinned(compilation.getPinned());
         }
+
+        List<Long> uniqueEvents = Optional.ofNullable(compilation.getEvents())
+                .orElse(List.of())
+                .stream()
+                .distinct()
+                .toList();
+
+        List<Event> eventsList = eventRepository.findByIdIn(uniqueEvents);
+
+        if (uniqueEvents.size() != eventsList.size()) {
+            throw new NotFoundException("One or more events where not found");
+        }
+
+        Set<Event> events = new HashSet<>(eventsList);
+        Set<Event> oldEvents = new HashSet<>(oldCompilation.getEvents());
+
+        if (!oldEvents.equals(events)) {
+            oldCompilation.setEvents(eventsList);
+        }
+
+        if (!oldCompilation.getTitle().equals(compilation.getTitle())) {
+            oldCompilation.setTitle(compilation.getTitle());
+        }
+
+        return CompilationMapper.toDto(compilationRepository.save(oldCompilation));
     }
 
     @Override
     public void deleteById(Long compId) {
         try {
             compilationRepository.deleteById(compId);
-        }catch (EmptyResultDataAccessException ex) {
+        } catch (EmptyResultDataAccessException ex) {
             throw new NotFoundException("Compilation with id=%d was not found".formatted(compId));
         }
     }
