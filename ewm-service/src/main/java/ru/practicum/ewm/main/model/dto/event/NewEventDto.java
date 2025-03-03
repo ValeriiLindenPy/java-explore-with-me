@@ -4,6 +4,7 @@ package ru.practicum.ewm.main.model.dto.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,7 @@ public class NewEventDto {
     private String annotation;
 
     @NotNull
-    private Integer category;
+    private Long category;
 
     @NotBlank
     @Size(min = 20, max = 7000)
@@ -40,9 +41,13 @@ public class NewEventDto {
     @NotNull
     private Location location;
 
-    private Boolean paid;
+    @Builder.Default
+    private Boolean paid = false;
 
-    private Integer participantLimit;
+    @PositiveOrZero
+    @Builder.Default
+    private Integer participantLimit = 0;
 
-    private Boolean requestModeration;
+    @Builder.Default
+    private Boolean requestModeration = true;
 }

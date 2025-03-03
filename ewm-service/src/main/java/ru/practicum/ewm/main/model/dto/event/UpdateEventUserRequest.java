@@ -1,6 +1,7 @@
 package ru.practicum.ewm.main.model.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class UpdateEventUserRequest {
     @Size(min = 20, max = 2000)
     private String annotation;
 
-    private Integer category;
+    private Long category;
 
     @Size(min = 20, max = 7000)
     private String description;
@@ -36,6 +37,7 @@ public class UpdateEventUserRequest {
 
     private Boolean paid;
 
+    @PositiveOrZero
     private Integer participantLimit;
 
     private Boolean requestModeration;

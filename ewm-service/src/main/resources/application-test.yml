@@ -24,3 +24,6 @@ spring:
       mode: always
   application:
     name: ewm-test
+
+stats-server:
+  url: http://localhost:9090

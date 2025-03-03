@@ -1,9 +1,11 @@
 package ru.practicum.ewm.main.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.main.exceptions.IntegrityException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.model.dto.user.NewUserRequest;
@@ -40,10 +42,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(NewUserRequest newUserRequest) {
-        return UserMapper.toDto(repository.save(User.builder()
-                .name(newUserRequest.getName())
-                .email(newUserRequest.getName())
-                .build()));
+        try {
+            return UserMapper.toDto(repository.save(User.builder()
+                    .name(newUserRequest.getName())
+                    .email(newUserRequest.getName())
+                    .build()));
+        } catch (DataIntegrityViolationException e) {
+            throw new IntegrityException(e.getMessage());
+        }
+
     }
 
     @Override

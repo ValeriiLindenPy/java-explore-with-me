@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.main.model.enums.ParticipationStatus;
+import ru.practicum.ewm.main.model.enums.RequestStatus;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,7 @@ public class Participation {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private ParticipationStatus status;
+    private RequestStatus status;
 
     @Column(name = "created")
     private LocalDateTime created;

@@ -50,7 +50,8 @@ public class Event {
     private Boolean requestModeration;
 
     @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
+    @Builder.Default
+    private Integer confirmedRequests = 0;
 
     @ManyToOne
     @JoinColumn(name = "initiator_id", nullable = false)

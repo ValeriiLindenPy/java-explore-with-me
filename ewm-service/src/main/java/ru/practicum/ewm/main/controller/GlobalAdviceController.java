@@ -4,7 +4,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.practicum.ewm.main.exceptions.ConflictException;
+import ru.practicum.ewm.main.exceptions.IntegrityException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
+import ru.practicum.ewm.main.exceptions.PublishException;
 import ru.practicum.ewm.main.model.dto.ApiError;
 import java.time.LocalDateTime;
 import static org.springframework.http.HttpStatus.*;
@@ -31,6 +34,39 @@ public class GlobalAdviceController {
                 .reason("The required object was not found.")
                 .timestamp(LocalDateTime.now())
                 .status(NOT_FOUND)
+                .build();
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(CONFLICT)
+    public ApiError handleConflictException(ConflictException ex) {
+        return ApiError.builder()
+                .message(ex.getMessage())
+                .reason("For the requested operation the conditions are not met.")
+                .timestamp(LocalDateTime.now())
+                .status(CONFLICT)
+                .build();
+    }
+
+    @ExceptionHandler(IntegrityException.class)
+    @ResponseStatus(CONFLICT)
+    public ApiError handleIntegrityException(IntegrityException ex) {
+        return ApiError.builder()
+                .message(ex.getMessage())
+                .reason("Integrity constraint has been violated.")
+                .timestamp(LocalDateTime.now())
+                .status(CONFLICT)
+                .build();
+    }
+
+    @ExceptionHandler(PublishException.class)
+    @ResponseStatus(FORBIDDEN)
+    public ApiError handlePublishException(PublishException ex) {
+        return ApiError.builder()
+                .message(ex.getMessage())
+                .reason("For the requested operation the conditions are not met.")
+                .timestamp(LocalDateTime.now())
+                .status(FORBIDDEN)
                 .build();
     }
 }
