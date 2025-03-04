@@ -192,7 +192,7 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(eventId))
         );
 
-        if(oldEvent.getState() == EventState.PUBLISHED) {
+        if (oldEvent.getState() == EventState.PUBLISHED) {
             throw new ConflictException("Only pending or canceled events can be changed");
         }
 

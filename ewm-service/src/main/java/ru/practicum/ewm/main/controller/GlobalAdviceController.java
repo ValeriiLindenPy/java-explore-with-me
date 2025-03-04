@@ -25,7 +25,7 @@ public class GlobalAdviceController {
 
     @ExceptionHandler(DataValidationException.class)
     @ResponseStatus(BAD_REQUEST)
-    public ApiError handleDataValidationException (DataValidationException ex) {
+    public ApiError handleDataValidationException(DataValidationException ex) {
         return ApiError.builder()
                 .message(ex.getMessage())
                 .reason("Incorrectly made request.")
