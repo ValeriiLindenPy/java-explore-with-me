@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.main.exceptions.ConflictException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
-import ru.practicum.ewm.main.exceptions.PublishException;
 import ru.practicum.ewm.main.model.Category;
 import ru.practicum.ewm.main.model.Event;
 import ru.practicum.ewm.main.model.User;

@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.ewm.main.model.Participation;
 import ru.practicum.ewm.main.model.enums.RequestStatus;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
