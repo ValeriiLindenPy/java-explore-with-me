@@ -4,10 +4,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.practicum.ewm.main.exceptions.ConflictException;
-import ru.practicum.ewm.main.exceptions.IntegrityException;
-import ru.practicum.ewm.main.exceptions.NotFoundException;
-import ru.practicum.ewm.main.exceptions.PublishException;
+import ru.practicum.ewm.main.exceptions.*;
 import ru.practicum.ewm.main.model.dto.ApiError;
 import java.time.LocalDateTime;
 import static org.springframework.http.HttpStatus.*;
@@ -18,6 +15,17 @@ public class GlobalAdviceController {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(BAD_REQUEST)
     public ApiError handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        return ApiError.builder()
+                .message(ex.getMessage())
+                .reason("Incorrectly made request.")
+                .timestamp(LocalDateTime.now())
+                .status(BAD_REQUEST)
+                .build();
+    }
+
+    @ExceptionHandler(DataValidationException.class)
+    @ResponseStatus(BAD_REQUEST)
+    public ApiError handleDataValidationException (DataValidationException ex) {
         return ApiError.builder()
                 .message(ex.getMessage())
                 .reason("Incorrectly made request.")

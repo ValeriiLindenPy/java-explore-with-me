@@ -45,12 +45,11 @@ public class UserServiceImpl implements UserService {
         try {
             return UserMapper.toDto(repository.save(User.builder()
                     .name(newUserRequest.getName())
-                    .email(newUserRequest.getName())
+                    .email(newUserRequest.getEmail())
                     .build()));
         } catch (DataIntegrityViolationException e) {
             throw new IntegrityException(e.getMessage());
         }
-
     }
 
     @Override

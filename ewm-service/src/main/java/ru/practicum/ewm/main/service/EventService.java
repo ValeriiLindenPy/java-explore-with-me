@@ -5,7 +5,7 @@ import ru.practicum.ewm.main.model.dto.event.*;
 import java.util.List;
 
 public interface EventService {
-    EventFullDto getOne(Long id);
+    EventFullDto getOne(Long id, String remoteAddr);
 
     EventFullDto getOne(Long userId, Long eventId);
 

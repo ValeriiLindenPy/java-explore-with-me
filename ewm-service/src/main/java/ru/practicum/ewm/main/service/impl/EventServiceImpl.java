@@ -1,7 +1,6 @@
 package ru.practicum.ewm.main.service.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +13,6 @@ import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.exceptions.PublishException;
 import ru.practicum.ewm.main.model.Category;
 import ru.practicum.ewm.main.model.Event;
-import ru.practicum.ewm.main.model.QEvent;
 import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.model.enums.EventState;
 import ru.practicum.ewm.main.repository.CategoryRepository;
@@ -36,27 +34,17 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final EventFilterBuilder filterBuilder;
-    private final JPAQueryFactory queryFactory;
 
     @Override
     @Transactional
-    public EventFullDto getOne(Long id) {
+    public EventFullDto getOne(Long id, String remoteAddr) {
         Event publishedEvent = repository.findByIdAndState(id, EventState.PUBLISHED).orElseThrow(
                 () -> new NotFoundException("Event with id=%d was not found".formatted(id))
         );
 
-        QEvent event = QEvent.event;
+        publishedEvent.getViews().add(remoteAddr);
 
-        queryFactory.update(event)
-                .set(event.views, event.views.add(1))
-                .where(event.id.eq(id))
-                .execute();
-
-        int views = publishedEvent.getViews();
-
-        views++;
-
-        publishedEvent.setViews(views);
+        repository.save(publishedEvent);
 
         return EventMapper.toDto(publishedEvent);
     }
@@ -64,16 +52,11 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto getOne(Long userId, Long eventId) {
-        QEvent event = QEvent.event;
-
-        queryFactory.update(event)
-                .set(event.views, event.views.add(1))
-                .where(event.id.eq(eventId).and(event.initiator.id.eq(userId)))
-                .execute();
-
-        return EventMapper.toDto(repository.findByIdAndInitiatorId(eventId, userId).orElseThrow(
+        Event publishedEvent = repository.findByIdAndInitiatorId(eventId, userId).orElseThrow(
                 () -> new NotFoundException("Event with id=%d was not found".formatted(eventId))
-        ));
+        );
+
+        return EventMapper.toDto(publishedEvent);
     }
 
     @Override
@@ -178,7 +161,7 @@ public class EventServiceImpl implements EventService {
                 }
                 case PUBLISH_EVENT -> {
                     if (oldEvent.getState() != EventState.PENDING) {
-                        throw new PublishException("Cannot publish the event because it's not in the right state: %s".formatted(oldEvent.getState()));
+                        throw new ConflictException("Cannot publish the event because it's not in the right state: %s".formatted(oldEvent.getState()));
                     }
                     oldEvent.setState(EventState.PUBLISHED);
                     oldEvent.setPublishedOn(LocalDateTime.now());
@@ -250,9 +233,7 @@ public class EventServiceImpl implements EventService {
 
         if (request.getStateAction() != null) {
             switch (request.getStateAction()) {
-                case CANCEL_REVIEW -> {
-                    return null;
-                }
+                case CANCEL_REVIEW -> oldEvent.setState(EventState.CANCELED);
                 case SEND_TO_REVIEW -> oldEvent.setState(EventState.PENDING);
             }
         }

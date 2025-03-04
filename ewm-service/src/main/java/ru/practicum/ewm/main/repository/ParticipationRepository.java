@@ -4,11 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.ewm.main.model.Participation;
 import ru.practicum.ewm.main.model.enums.RequestStatus;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
-    List<Participation> findByEventIdAndRequesterId(Long eventId, Long userId);
+    List<Participation> findByEvent_IdAndRequester_Id(Long eventId, Long userId);
 
     List<Participation> findByIdInAndEventId(List<Long> requestIds, Long eventId);
 
@@ -17,4 +18,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
     List<Participation> findByRequesterId(Long userId);
 
     Optional<Participation> findByIdAndRequesterId(Long requestId, Long userId);
+
+    List<Participation> findByEvent_Id(Long eventId);
 }

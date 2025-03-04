@@ -81,7 +81,7 @@ public class CompilationServiceImpl implements CompilationService {
                 () -> new NotFoundException("Compilation with id=%d was not found".formatted(compId))
         );
 
-        if (compilation.getPinned() != oldCompilation.getPinned()) {
+        if (compilation.getPinned() != null && compilation.getPinned() != oldCompilation.getPinned()) {
             oldCompilation.setPinned(compilation.getPinned());
         }
 
@@ -104,7 +104,7 @@ public class CompilationServiceImpl implements CompilationService {
             oldCompilation.setEvents(eventsList);
         }
 
-        if (!oldCompilation.getTitle().equals(compilation.getTitle())) {
+        if (compilation.getTitle() != null && !oldCompilation.getTitle().equals(compilation.getTitle())) {
             oldCompilation.setTitle(compilation.getTitle());
         }
 

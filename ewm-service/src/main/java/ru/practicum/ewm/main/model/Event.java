@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.main.model.enums.EventState;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -67,8 +69,11 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
 
-    @Column(name = "views")
-    private Integer views;
+    @ElementCollection
+    @CollectionTable(name = "event_views", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "view_identifier")
+    @Builder.Default
+    private Set<String> views = new HashSet<>();
 
     @PrePersist
     private void setCreatedOn() {

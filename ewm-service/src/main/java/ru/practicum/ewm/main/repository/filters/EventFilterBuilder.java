@@ -2,6 +2,7 @@ package ru.practicum.ewm.main.repository.filters;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Component;
+import ru.practicum.ewm.main.exceptions.DataValidationException;
 import ru.practicum.ewm.main.model.QEvent;
 import ru.practicum.ewm.main.model.dto.event.AdminEventFilterDto;
 import ru.practicum.ewm.main.model.dto.event.EventFilterDto;
@@ -36,10 +37,14 @@ public class EventFilterBuilder {
         if (dto.getRangeStart() == null && dto.getRangeEnd() == null) {
             predicate = predicate.and(event.eventDate.after(now));
         } else if (dto.getRangeStart() != null && dto.getRangeEnd() != null) {
+            if (dto.getRangeStart().isAfter(dto.getRangeEnd())) {
+                throw new DataValidationException("Range start should be before range end.");
+            }
+
             predicate = predicate.and(event.eventDate.between(dto.getRangeStart(), dto.getRangeEnd()));
         } else if (dto.getRangeStart() != null) {
             predicate = predicate.and(event.eventDate.after(dto.getRangeStart()));
-        } else if (dto.getRangeEnd() != null) {
+        } else {
             predicate = predicate.and(event.eventDate.before(dto.getRangeEnd()));
         }
 

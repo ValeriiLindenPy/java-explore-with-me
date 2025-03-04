@@ -36,7 +36,8 @@ public class ParticipationServiceImpl implements ParticipationService {
     @Override
     @Transactional(readOnly = true)
     public List<ParticipationRequestDto> getRequests(Long userId, Long eventId) {
-        return repository.findByEventIdAndRequesterId(eventId, userId).stream()
+        return repository.findByEvent_Id(eventId).stream()
+                .filter(participation -> Objects.equals(participation.getEvent().getInitiator().getId(), userId))
                 .map(ParticipationMapper::toDto)
                 .toList();
     }
@@ -146,7 +147,7 @@ public class ParticipationServiceImpl implements ParticipationService {
                 () -> new NotFoundException("User with id=%d was not found".formatted(userId))
         );
 
-        List<Participation> participations = repository.findByEventIdAndRequesterId(eventId, userId);
+        List<Participation> participations = repository.findByEvent_IdAndRequester_Id(eventId, userId);
 
         if (!participations.isEmpty()) {
             throw new ConflictException("Duplication request for the event.");
@@ -160,17 +161,13 @@ public class ParticipationServiceImpl implements ParticipationService {
             throw new ConflictException("This event hasn't yet published.");
         }
 
-        if (Objects.equals(event.getParticipantLimit(), event.getConfirmedRequests())) {
-            throw new ConflictException("The participant limit has been reached");
+        if (event.getParticipantLimit() != 0) {
+            if (Objects.equals(event.getParticipantLimit(), event.getConfirmedRequests())) {
+                throw new ConflictException("The participant limit has been reached");
+            }
         }
 
-        if (event.getRequestModeration()) {
-            return ParticipationMapper.toDto(repository.save(Participation.builder()
-                    .event(event)
-                    .requester(requester)
-                    .status(RequestStatus.PENDING)
-                    .build()));
-        } else {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             QEvent qEvent = QEvent.event;
 
             queryFactory.update(qEvent)
@@ -184,6 +181,12 @@ public class ParticipationServiceImpl implements ParticipationService {
                     .status(RequestStatus.CONFIRMED)
                     .build()));
         }
+
+        return ParticipationMapper.toDto(repository.save(Participation.builder()
+                .event(event)
+                .requester(requester)
+                .status(RequestStatus.PENDING)
+                .build()));
     }
 
     @Override

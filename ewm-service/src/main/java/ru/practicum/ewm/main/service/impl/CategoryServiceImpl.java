@@ -15,9 +15,7 @@ import ru.practicum.ewm.main.model.mapper.CategoryMapper;
 import ru.practicum.ewm.main.repository.CategoryRepository;
 import ru.practicum.ewm.main.repository.EventRepository;
 import ru.practicum.ewm.main.service.CategoryService;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +63,9 @@ public class CategoryServiceImpl implements CategoryService {
             if (!dto.getName().equals(category.getName())) {
                 category.setName(dto.getName());
             }
-            return CategoryMapper.toDto(repository.save(category));
+            Category savedCategory = repository.save(category);
+            repository.flush();
+            return CategoryMapper.toDto(savedCategory);
         } catch (DataIntegrityViolationException e) {
             throw new IntegrityException(e.getMessage());
         }

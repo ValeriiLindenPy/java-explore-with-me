@@ -28,6 +28,6 @@ public class PublicEventController {
     @GetMapping("/{id}")
     public EventFullDto getOne(@PathVariable("id") Long id, HttpServletRequest request) {
         statsClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr());
-        return service.getOne(id);
+        return service.getOne(id, request.getRemoteAddr());
     }
 }
