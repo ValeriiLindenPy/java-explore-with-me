@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.main.model.enums.EventState;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Builder

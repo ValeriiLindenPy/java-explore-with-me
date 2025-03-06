@@ -8,8 +8,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.stats.client.StatsClient;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.List;
 public class StatsClientImpl implements StatsClient {
     private final RestTemplate rest;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
 
     @Override
     public ResponseEntity<Void> postHit(String app, String uri, String ip) {
@@ -32,7 +29,6 @@ public class StatsClientImpl implements StatsClient {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity<EndpointHit> request = new HttpEntity<>(hit, headers);
 
         return rest.exchange("/hit", HttpMethod.POST, request, Void.class);
