@@ -1,12 +1,8 @@
 package ru.practicum.ewm.main.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.main.exceptions.IntegrityException;
-import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.model.dto.user.NewUserRequest;
 import ru.practicum.ewm.main.model.dto.user.UserDto;
@@ -42,23 +38,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto create(NewUserRequest newUserRequest) {
-        try {
-            return UserMapper.toDto(repository.save(User.builder()
-                    .name(newUserRequest.getName())
-                    .email(newUserRequest.getEmail())
-                    .build()));
-        } catch (DataIntegrityViolationException e) {
-            throw new IntegrityException(e.getMessage());
-        }
+        return UserMapper.toDto(repository.save(User.builder()
+                .name(newUserRequest.getName())
+                .email(newUserRequest.getEmail())
+                .build()));
     }
 
     @Override
     @Transactional
     public void deleteById(Long userId) {
-        try {
-            repository.deleteById(userId);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException("User with id=%d was not found".formatted(userId));
-        }
+        repository.deleteById(userId);
     }
 }

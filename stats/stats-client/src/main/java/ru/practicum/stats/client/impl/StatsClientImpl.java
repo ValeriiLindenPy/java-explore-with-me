@@ -2,6 +2,7 @@ package ru.practicum.stats.client.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.ewm.dto.EndpointHit;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Component
 public class StatsClientImpl implements StatsClient {
     private final RestTemplate rest;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -38,15 +40,10 @@ public class StatsClientImpl implements StatsClient {
 
     @Override
     public ResponseEntity<Object> getViewStats(String start, String end, List<String> uris, Boolean unique) {
-        LocalDateTime parsedStart = LocalDateTime.parse(start, FORMATTER);
-        LocalDateTime parsedEnd = LocalDateTime.parse(end, FORMATTER);
-
-        String encodedStart = URLEncoder.encode(FORMATTER.format(parsedStart), StandardCharsets.UTF_8);
-        String encodedEnd = URLEncoder.encode(FORMATTER.format(parsedEnd), StandardCharsets.UTF_8);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/stats")
-                .queryParam("start", encodedStart)
-                .queryParam("end", encodedEnd);
+                .queryParam("start", start)
+                .queryParam("end", end);
 
         if (uris != null && !uris.isEmpty()) {
             builder.queryParam("uris", String.join(",", uris));

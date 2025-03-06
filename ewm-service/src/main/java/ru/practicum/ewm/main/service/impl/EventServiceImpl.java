@@ -1,13 +1,17 @@
 package ru.practicum.ewm.main.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.main.exceptions.ConflictException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.model.Category;
@@ -22,8 +26,10 @@ import ru.practicum.ewm.main.model.enums.SortOption;
 import ru.practicum.ewm.main.model.mapper.EventMapper;
 import ru.practicum.ewm.main.repository.EventRepository;
 import ru.practicum.ewm.main.service.EventService;
+import ru.practicum.stats.client.StatsClient;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -33,6 +39,7 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final EventFilterBuilder filterBuilder;
+    private final StatsClient statsClient;
 
     @Override
     @Transactional
@@ -41,9 +48,24 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(id))
         );
 
-        publishedEvent.getViews().add(remoteAddr);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String start = publishedEvent.getCreatedOn().format(formatter);
+        String end = LocalDateTime.now().format(formatter);
 
-        repository.save(publishedEvent);
+        ResponseEntity<Object> response = statsClient.getViewStats(start, end, List.of("/events/" + id), true);
+        Object responseBody = response.getBody();
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<ViewStats> viewStatsList = mapper.convertValue(responseBody,
+                new TypeReference<>() {
+                });
+
+        if (!viewStatsList.isEmpty()) {
+            publishedEvent.setViews(viewStatsList.getFirst().getHits());
+            repository.save(publishedEvent);
+        } else {
+            publishedEvent.setViews(0L);
+        }
 
         return EventMapper.toDto(publishedEvent);
     }

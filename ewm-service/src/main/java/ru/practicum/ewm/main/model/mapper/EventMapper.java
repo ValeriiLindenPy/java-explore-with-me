@@ -21,7 +21,7 @@ public class EventMapper {
                 .paid(event.getPaid())
                 .participantLimit(event.getParticipantLimit())
                 .publishedOn(event.getPublishedOn())
-                .views(event.getViews().size())
+                .views(event.getViews())
                 .state(event.getState())
                 .requestModeration(event.getRequestModeration())
                 .build();
@@ -32,7 +32,7 @@ public class EventMapper {
                 .id(event.getId())
                 .title(event.getTitle())
                 .initiator(UserMapper.toShortDto(event.getInitiator()))
-                .views(event.getViews().size())
+                .views(event.getViews())
                 .eventDate(event.getEventDate())
                 .confirmedRequests(event.getConfirmedRequests())
                 .annotation(event.getAnnotation())

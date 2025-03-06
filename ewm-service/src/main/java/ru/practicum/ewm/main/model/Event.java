@@ -69,11 +69,8 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
 
-    @ElementCollection
-    @CollectionTable(name = "event_views", joinColumns = @JoinColumn(name = "event_id"))
-    @Column(name = "view_identifier")
-    @Builder.Default
-    private Set<String> views = new HashSet<>();
+    @Column(name = "views")
+    private Long views;
 
     @PrePersist
     private void setCreatedOn() {

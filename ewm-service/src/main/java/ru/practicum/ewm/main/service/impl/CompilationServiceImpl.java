@@ -27,9 +27,10 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CompilationDto> getAll(Boolean pinned, Integer from, Integer size) {
-        if (pinned != null && pinned) {
-            return compilationRepository.findByPinnedTrue().stream()
+        if (pinned != null) {
+            return compilationRepository.findByPinned(pinned).stream()
                     .skip(from)
                     .limit(size)
                     .map(CompilationMapper::toDto)
@@ -44,6 +45,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompilationDto getById(Long compId) {
         return CompilationMapper.toDto(compilationRepository.findById(compId).orElseThrow(
                 () -> new NotFoundException("Compilation with id=%d was not found".formatted(compId))

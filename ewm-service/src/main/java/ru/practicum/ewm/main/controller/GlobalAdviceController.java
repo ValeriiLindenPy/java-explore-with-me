@@ -1,5 +1,7 @@
 package ru.practicum.ewm.main.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -45,6 +47,17 @@ public class GlobalAdviceController {
                 .build();
     }
 
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    @ResponseStatus(NOT_FOUND)
+    public ApiError handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        return ApiError.builder()
+                .message(ex.getMessage())
+                .reason("The required object was not found.")
+                .timestamp(LocalDateTime.now())
+                .status(NOT_FOUND)
+                .build();
+    }
+
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(CONFLICT)
     public ApiError handleConflictException(ConflictException ex) {
@@ -56,9 +69,9 @@ public class GlobalAdviceController {
                 .build();
     }
 
-    @ExceptionHandler(IntegrityException.class)
+    @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(CONFLICT)
-    public ApiError handleIntegrityException(IntegrityException ex) {
+    public ApiError handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         return ApiError.builder()
                 .message(ex.getMessage())
                 .reason("Integrity constraint has been violated.")
