@@ -12,7 +12,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 @Configuration
 public class ClientConfig {
     @Value("${stats-server.url}")
-    private static String serverUrl;
+    private String serverUrl;
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {

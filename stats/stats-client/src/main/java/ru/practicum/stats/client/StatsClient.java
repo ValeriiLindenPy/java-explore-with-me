@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface StatsClient {
 
-    ResponseEntity<Void> postHit(@NotBlank String app, @NotBlank String uri, @NotBlank String ip);
+    ResponseEntity<Void> postHit(@NotBlank String uri, @NotBlank String ip);
 
     ResponseEntity<Object> getViewStats(@NotNull String start, @NotNull String end, @Nullable List<String> uris, @Nullable Boolean unique);
 }
