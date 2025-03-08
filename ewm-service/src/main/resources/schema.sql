@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS events (
     initiator_id BIGINT NOT NULL REFERENCES users(id),
     created_on TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     published_on TIMESTAMP WITHOUT TIME ZONE,
-    state VARCHAR(50),
-    views BIGINT
+    state VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS participations (

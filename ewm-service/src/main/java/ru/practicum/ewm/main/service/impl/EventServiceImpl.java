@@ -30,7 +30,9 @@ import ru.practicum.stats.client.StatsClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -48,26 +50,62 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(id))
         );
 
+        EventFullDto dto = EventMapper.toDto(publishedEvent);
+
+        dto.setViews(getViewsForEvents(List.of(publishedEvent)).get(dto.getId()));
+
+        return dto;
+    }
+
+    private Map<Long, Long> getViewsForEvents(List<Event> events) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String start = publishedEvent.getCreatedOn().format(formatter);
+
+        LocalDateTime earliestEvent = events.getFirst().getCreatedOn();
+
+        for (Event event : events) {
+            if (event.getCreatedOn().isBefore(earliestEvent)) {
+                earliestEvent = event.getCreatedOn();
+            }
+        }
+
+        String start = earliestEvent.format(formatter);
+
         String end = LocalDateTime.now().format(formatter);
 
-        ResponseEntity<Object> response = statsClient.getViewStats(start, end, List.of("/events/" + id), true);
+        Map<String, Long> uriIdMap = new HashMap<>();
+
+        List<String> eventsUris = events.stream()
+                .map(event -> {
+                    String uri = "/events/" + event.getId();
+
+                    uriIdMap.put(uri, event.getId());
+
+                    return uri;
+                }).toList();
+
+        ResponseEntity<Object> response = statsClient.getViewStats(start, end, eventsUris, true);
+
         Object responseBody = response.getBody();
 
         ObjectMapper mapper = new ObjectMapper();
+
         List<ViewStats> viewStatsList = mapper.convertValue(responseBody,
                 new TypeReference<>() {
                 });
 
-        if (!viewStatsList.isEmpty()) {
-            publishedEvent.setViews(viewStatsList.getFirst().getHits());
-            repository.save(publishedEvent);
+        Map<Long, Long> idsToViewsMap = new HashMap<>();
+
+        if (viewStatsList.isEmpty()) {
+            for (Event event : events) {
+                idsToViewsMap.put(event.getId(), 0L);
+            }
         } else {
-            publishedEvent.setViews(0L);
+            for (ViewStats viewStats : viewStatsList) {
+                idsToViewsMap.put(uriIdMap.get(viewStats.getUri()), viewStats.getHits());
+            }
         }
 
-        return EventMapper.toDto(publishedEvent);
+        return idsToViewsMap;
     }
 
     @Override

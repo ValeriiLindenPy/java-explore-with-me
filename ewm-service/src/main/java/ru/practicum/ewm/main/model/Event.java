@@ -67,9 +67,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventState state;
 
-    @Column(name = "views")
-    private Long views;
-
     @PrePersist
     private void setCreatedOn() {
         this.createdOn = LocalDateTime.now();
