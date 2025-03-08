@@ -1,6 +1,7 @@
 package ru.practicum.stats.client.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,11 +18,13 @@ import java.util.List;
 public class StatsClientImpl implements StatsClient {
     private final RestTemplate rest;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @Override
-    public ResponseEntity<Void> postHit(String app, String uri, String ip) {
+    public ResponseEntity<Void> postHit(String uri, String ip) {
         EndpointHit hit = EndpointHit.builder()
-                .app(app)
+                .app(applicationName)
                 .timestamp(LocalDateTime.now())
                 .uri(uri)
                 .ip(ip)

@@ -57,57 +57,6 @@ public class EventServiceImpl implements EventService {
         return dto;
     }
 
-    private Map<Long, Long> getViewsForEvents(List<Event> events) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        LocalDateTime earliestEvent = events.getFirst().getCreatedOn();
-
-        for (Event event : events) {
-            if (event.getCreatedOn().isBefore(earliestEvent)) {
-                earliestEvent = event.getCreatedOn();
-            }
-        }
-
-        String start = earliestEvent.format(formatter);
-
-        String end = LocalDateTime.now().format(formatter);
-
-        Map<String, Long> uriIdMap = new HashMap<>();
-
-        List<String> eventsUris = events.stream()
-                .map(event -> {
-                    String uri = "/events/" + event.getId();
-
-                    uriIdMap.put(uri, event.getId());
-
-                    return uri;
-                }).toList();
-
-        ResponseEntity<Object> response = statsClient.getViewStats(start, end, eventsUris, true);
-
-        Object responseBody = response.getBody();
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        List<ViewStats> viewStatsList = mapper.convertValue(responseBody,
-                new TypeReference<>() {
-                });
-
-        Map<Long, Long> idsToViewsMap = new HashMap<>();
-
-        if (viewStatsList.isEmpty()) {
-            for (Event event : events) {
-                idsToViewsMap.put(event.getId(), 0L);
-            }
-        } else {
-            for (ViewStats viewStats : viewStatsList) {
-                idsToViewsMap.put(uriIdMap.get(viewStats.getUri()), viewStats.getHits());
-            }
-        }
-
-        return idsToViewsMap;
-    }
-
     @Override
     @Transactional
     public EventFullDto getOne(Long userId, Long eventId) {
@@ -115,7 +64,11 @@ public class EventServiceImpl implements EventService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(eventId))
         );
 
-        return EventMapper.toDto(publishedEvent);
+        EventFullDto dto = EventMapper.toDto(publishedEvent);
+
+        dto.setViews(getViewsForEvents(List.of(publishedEvent)).get(dto.getId()));
+
+        return dto;
     }
 
     @Override
@@ -131,9 +84,16 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> page = repository.findAll(predicate, pageable);
 
+        Map<Long, Long> eventsViews = getViewsForEvents(page.getContent());
+
         return page.getContent()
                 .stream()
                 .map(EventMapper::toShortDto)
+                .map(dto -> {
+                    dto.setViews(eventsViews.get(dto.getId()));
+                    return dto;
+                        }
+                )
                 .toList();
     }
 
@@ -149,9 +109,16 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> page = repository.findAll(predicate, pageable);
 
+        Map<Long, Long> eventsViews = getViewsForEvents(page.getContent());
+
         return page.getContent()
                 .stream()
                 .map(EventMapper::toDto)
+                .map(dto -> {
+                            dto.setViews(eventsViews.get(dto.getId()));
+                            return dto;
+                        }
+                )
                 .toList();
     }
 
@@ -165,8 +132,16 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> page = repository.findAllByInitiatorId(userId, pageable);
 
-        return page.getContent().stream()
+        Map<Long, Long> eventsViews = getViewsForEvents(page.getContent());
+
+        return page.getContent()
+                .stream()
                 .map(EventMapper::toShortDto)
+                .map(dto -> {
+                            dto.setViews(eventsViews.get(dto.getId()));
+                            return dto;
+                        }
+                )
                 .toList();
     }
 
@@ -353,5 +328,72 @@ public class EventServiceImpl implements EventService {
             case VIEWS -> Sort.by(Sort.Direction.DESC, "views");
             case EVENT_DATE -> Sort.by(Sort.Direction.DESC, "eventDate");
         };
+    }
+
+    /**
+     * Retrieves the view counts for a given list of events from a statistics service.
+     * <p>
+     * The method identifies the earliest creation date among the provided events and uses this
+     * as the start of the time range. The current time is used as the end of the time range.
+     * It then constructs URIs (in the format {@code /events/<eventId>}) for each event and
+     * requests view statistics from the statsClient within the calculated time interval.
+     * <p>
+     * If the statistics service returns results, each returned URI is mapped to its corresponding
+     * event ID, and the hits (view counts) are stored in the resulting map. If the statistics
+     * service returns no results, each event is assigned a view count of zero.
+     *
+     * @param events the list of {@code Event} objects for which to retrieve view statistics.
+     * @return a map where the key is the event ID (type {@code Long}) and the value is the
+     *         corresponding view count (type {@code Long}).
+     */
+    private Map<Long, Long> getViewsForEvents(List<Event> events) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime earliestEvent = events.getFirst().getCreatedOn();
+
+        for (Event event : events) {
+            if (event.getCreatedOn().isBefore(earliestEvent)) {
+                earliestEvent = event.getCreatedOn();
+            }
+        }
+
+        String start = earliestEvent.format(formatter);
+
+        String end = LocalDateTime.now().format(formatter);
+
+        Map<String, Long> uriIdMap = new HashMap<>();
+
+        List<String> eventsUris = events.stream()
+                .map(event -> {
+                    String uri = "/events/" + event.getId();
+
+                    uriIdMap.put(uri, event.getId());
+
+                    return uri;
+                }).toList();
+
+        ResponseEntity<Object> response = statsClient.getViewStats(start, end, eventsUris, true);
+
+        Object responseBody = response.getBody();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<ViewStats> viewStatsList = mapper.convertValue(responseBody,
+                new TypeReference<>() {
+                });
+
+        Map<Long, Long> idsToViewsMap = new HashMap<>();
+
+        if (viewStatsList.isEmpty()) {
+            for (Event event : events) {
+                idsToViewsMap.put(event.getId(), 0L);
+            }
+        } else {
+            for (ViewStats viewStats : viewStatsList) {
+                idsToViewsMap.put(uriIdMap.get(viewStats.getUri()), viewStats.getHits());
+            }
+        }
+
+        return idsToViewsMap;
     }
 }
