@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
+import ru.practicum.ewm.stats.server.exceptions.InvalidDateException;
 import ru.practicum.ewm.stats.server.repository.EndpointHitRepository;
 import ru.practicum.ewm.stats.server.repository.ViewStatsProjection;
 import ru.practicum.ewm.stats.server.service.HitMapper;
@@ -27,7 +28,7 @@ public class StatServiceImpl implements StatsService {
         List<String> processedUris = (uris != null) ? uris : List.of();
 
         if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Start date must be before end date");
+            throw new InvalidDateException("Start date must be before end date");
         }
 
         if (unique) {

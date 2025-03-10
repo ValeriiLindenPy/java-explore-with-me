@@ -13,6 +13,8 @@ import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.stats.server.exceptions.InvalidDateException;
 import ru.practicum.ewm.stats.server.service.StatsService;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -38,14 +40,14 @@ public class StatsController {
                                                     @RequestParam(defaultValue = "false") Boolean unique) {
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
-
         try {
-            startDateTime = LocalDateTime.parse(start, FORMATTER);
-            endDateTime = LocalDateTime.parse(end, FORMATTER);
+            String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
+            String decodedEnd = URLDecoder.decode(end, StandardCharsets.UTF_8);
+            startDateTime = LocalDateTime.parse(decodedStart, FORMATTER);
+            endDateTime = LocalDateTime.parse(decodedEnd, FORMATTER);
         } catch (DateTimeParseException e) {
             throw new InvalidDateException("Invalid date format: " + e.getMessage());
         }
-
         List<ViewStats> results = service.getViews(startDateTime, endDateTime, uris, unique);
         return ResponseEntity.ok(results);
     }
