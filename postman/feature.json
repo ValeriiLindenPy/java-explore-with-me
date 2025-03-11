@@ -182,6 +182,100 @@
 			"response": []
 		},
 		{
+			"name": "comment unpublished event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Ответ должен содержать код статуса 409\", function () {\r",
+							"    pm.response.to.have.status(409);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\": \"Test comment\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"{{user_id}}",
+						"events",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "publish event",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200\", function () {\r",
+							"    pm.response.to.be.ok;  \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stateAction\":\"PUBLISH_EVENT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/admin/events/{{event_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"admin",
+						"events",
+						"{{event_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "add comment",
 			"event": [
 				{
@@ -228,7 +322,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/{{event_id}}/comments",
+					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
@@ -236,8 +330,13 @@
 						"users",
 						"{{user_id}}",
 						"events",
-						"{{event_id}}",
 						"comments"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event_id}}"
+						}
 					]
 				}
 			},
@@ -305,7 +404,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/{{event_id}}/comments",
+					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
@@ -313,8 +412,52 @@
 						"users",
 						"{{user_id}}",
 						"events",
-						"{{event_id}}",
 						"comments"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get events with comment count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате JSON\", function () {\r",
+							"    pm.response.to.be.ok;    \r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"const body = pm.response.json()[0];\r",
+							"\r",
+							"pm.test(\"Число комментариев должно быть верным\", function () {\r",
+							"    pm.expect(body.comments).to.equal(1);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events"
 					]
 				}
 			},
@@ -349,7 +492,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"text\": \"Updated text\"\r\n}",
+					"raw": "{\r\n    \"text\": \"Updated text\",\r\n    \"commentId\" : {{comment_id}}\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -357,7 +500,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/{{event_id}}/comments/{{comment_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
@@ -365,9 +508,13 @@
 						"users",
 						"{{user_id}}",
 						"events",
-						"{{event_id}}",
-						"comments",
-						"{{comment_id}}"
+						"comments"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event_id}}"
+						}
 					]
 				}
 			},
@@ -403,7 +550,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/{{event_id}}/comments/{{comment_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/events/comments/{{comment_id}}?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
@@ -411,9 +558,14 @@
 						"users",
 						"{{user_id}}",
 						"events",
-						"{{event_id}}",
 						"comments",
 						"{{comment_id}}"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "{{event_id}}"
+						}
 					]
 				}
 			},

@@ -12,13 +12,13 @@ import ru.practicum.ewm.main.service.CommentService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{userId}/events/{eventId}/comments")
+@RequestMapping("/users/{userId}/events/comments")
 @RequiredArgsConstructor
 public class PrivateCommentController {
     private final CommentService service;
 
     @GetMapping
-    public List<CommentDto> getEventComments(@PathVariable Long eventId,
+    public List<CommentDto> getEventComments(@RequestParam Long eventId,
                                              @RequestParam(defaultValue = "0", required = false) Integer from,
                                              @RequestParam(defaultValue = "10", required = false) Integer size) {
         return service.getEventComments(eventId, from, size);
@@ -27,23 +27,22 @@ public class PrivateCommentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addComment(@PathVariable Long userId,
-                                 @PathVariable Long eventId,
+                                 @RequestParam Long eventId,
                                  @RequestBody @Valid NewCommentDto newCommentDto) {
         return service.createComment(userId, eventId, newCommentDto);
     }
 
-    @PatchMapping("/{commentId}")
+    @PatchMapping
     public CommentDto updateComment(@PathVariable Long userId,
-                                    @PathVariable Long eventId,
-                                    @PathVariable Long commentId,
+                                    @RequestParam Long eventId,
                                     @RequestBody @Valid UpdateCommentDto comment) {
-        return service.updateComment(userId, eventId, commentId, comment);
+        return service.updateComment(userId, eventId, comment);
     }
 
     @DeleteMapping("/{commentId}")
     public void deleteComment(@PathVariable Long userId,
-                                    @PathVariable Long eventId,
-                                    @PathVariable Long commentId) {
+                              @RequestParam Long eventId,
+                              @PathVariable Long commentId) {
         service.deleteComment(userId, eventId, commentId);
     }
 }

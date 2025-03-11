@@ -15,10 +15,12 @@ import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.main.exceptions.ConflictException;
 import ru.practicum.ewm.main.exceptions.NotFoundException;
 import ru.practicum.ewm.main.model.Category;
+import ru.practicum.ewm.main.model.Comment;
 import ru.practicum.ewm.main.model.Event;
 import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.model.enums.EventState;
 import ru.practicum.ewm.main.repository.CategoryRepository;
+import ru.practicum.ewm.main.repository.CommentRepository;
 import ru.practicum.ewm.main.repository.UserRepository;
 import ru.practicum.ewm.main.repository.filters.EventFilterBuilder;
 import ru.practicum.ewm.main.model.dto.event.*;
@@ -33,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository repository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
     private final EventFilterBuilder filterBuilder;
     private final StatsClient statsClient;
 
@@ -86,11 +90,14 @@ public class EventServiceImpl implements EventService {
 
         Map<Long, Long> eventsViews = getViewsForEvents(page.getContent());
 
+        Map<Long, Long> eventsComments= getCommentsForEvents(page.getContent());
+
         return page.getContent()
                 .stream()
                 .map(EventMapper::toShortDto)
                 .map(dto -> {
                     dto.setViews(eventsViews.get(dto.getId()));
+                    dto.setComments(eventsComments.get(dto.getId()));
                     return dto;
                         }
                 )
@@ -395,5 +402,20 @@ public class EventServiceImpl implements EventService {
         }
 
         return idsToViewsMap;
+    }
+
+    private Map<Long, Long> getCommentsForEvents(List<Event> events) {
+
+        List<Comment> comments = commentRepository.findByEventIdInAndIsModeratedTrue(events.stream().map(Event::getId).toList());
+
+        Map<Long, Long> idsToCommentsMap = new HashMap<>();
+
+        for (Event event : events) {
+            idsToCommentsMap.put(event.getId(), comments
+                    .stream().filter(comment -> Objects.equals(comment.getEvent()
+                            .getId(), event.getId())).count());
+        }
+
+        return idsToCommentsMap;
     }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.ewm.main.model.dto.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +31,9 @@ public class EventShortDto {
     private UserShortDto initiator;
 
     private Boolean paid;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long comments;
 
     private Long views;
 }

@@ -11,7 +11,7 @@ public interface CommentService {
 
     List<CommentDto> getEventComments(Long eventId, Integer from, Integer size);
 
-    CommentDto updateComment(Long userId, Long eventId, Long commentId, UpdateCommentDto comment);
+    CommentDto updateComment(Long userId, Long eventId, UpdateCommentDto comment);
 
     void moderateComment(Long commentId);
 

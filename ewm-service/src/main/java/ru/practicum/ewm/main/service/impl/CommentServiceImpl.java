@@ -11,6 +11,7 @@ import ru.practicum.ewm.main.model.User;
 import ru.practicum.ewm.main.model.dto.comment.CommentDto;
 import ru.practicum.ewm.main.model.dto.comment.NewCommentDto;
 import ru.practicum.ewm.main.model.dto.comment.UpdateCommentDto;
+import ru.practicum.ewm.main.model.enums.EventState;
 import ru.practicum.ewm.main.model.mapper.CommentMapper;
 import ru.practicum.ewm.main.repository.CommentRepository;
 import ru.practicum.ewm.main.repository.EventRepository;
@@ -40,6 +41,10 @@ public class CommentServiceImpl implements CommentService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(eventId))
         );
 
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new ConflictException("You can't comment unpublished events");
+        }
+
         return CommentMapper.toDto(repository.save(Comment.builder()
                 .text(newCommentDto.getText())
                 .author(author)
@@ -63,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateComment(Long userId, Long eventId, Long commentId, UpdateCommentDto comment) {
+    public CommentDto updateComment(Long userId, Long eventId, UpdateCommentDto comment) {
         User author = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with id=%d was not found".formatted(userId))
         );
@@ -72,12 +77,12 @@ public class CommentServiceImpl implements CommentService {
                 () -> new NotFoundException("Event with id=%d was not found".formatted(eventId))
         );
 
-        Comment oldComment = repository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Comment with id=%d was not found".formatted(commentId))
+        Comment oldComment = repository.findById(comment.getCommentId()).orElseThrow(
+                () -> new NotFoundException("Comment with id=%d was not found".formatted(comment.getCommentId()))
         );
 
         if (!oldComment.getAuthor().equals(author)) {
-            throw new ConflictException("User with id=%d is not the author of the comment with id=%d".formatted(userId, commentId));
+            throw new ConflictException("User with id=%d is not the author of the comment with id=%d".formatted(userId, comment.getCommentId()));
         }
 
         if (!oldComment.getText().equals(comment.getText())) {
