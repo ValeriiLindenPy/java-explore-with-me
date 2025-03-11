@@ -90,15 +90,15 @@ public class EventServiceImpl implements EventService {
 
         Map<Long, Long> eventsViews = getViewsForEvents(page.getContent());
 
-        Map<Long, Long> eventsComments= getCommentsForEvents(page.getContent());
+        Map<Long, Long> eventsComments = getCommentsForEvents(page.getContent());
 
         return page.getContent()
                 .stream()
                 .map(EventMapper::toShortDto)
                 .map(dto -> {
-                    dto.setViews(eventsViews.get(dto.getId()));
-                    dto.setComments(eventsComments.get(dto.getId()));
-                    return dto;
+                            dto.setViews(eventsViews.get(dto.getId()));
+                            dto.setComments(eventsComments.get(dto.getId()));
+                            return dto;
                         }
                 )
                 .toList();
@@ -351,7 +351,7 @@ public class EventServiceImpl implements EventService {
      *
      * @param events the list of {@code Event} objects for which to retrieve view statistics.
      * @return a map where the key is the event ID (type {@code Long}) and the value is the
-     *         corresponding view count (type {@code Long}).
+     * corresponding view count (type {@code Long}).
      */
     private Map<Long, Long> getViewsForEvents(List<Event> events) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
