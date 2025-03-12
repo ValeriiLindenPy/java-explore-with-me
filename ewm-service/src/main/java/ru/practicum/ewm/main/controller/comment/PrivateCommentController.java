@@ -12,7 +12,7 @@ import ru.practicum.ewm.main.service.CommentService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/{userId}/events/comments")
+@RequestMapping("/users/{userId}/comments")
 @RequiredArgsConstructor
 public class PrivateCommentController {
     private final CommentService service;

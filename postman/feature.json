@@ -213,14 +213,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"users",
 						"{{user_id}}",
-						"events",
 						"comments"
 					],
 					"query": [
@@ -322,14 +321,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"users",
 						"{{user_id}}",
-						"events",
 						"comments"
 					],
 					"query": [
@@ -404,14 +402,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"users",
 						"{{user_id}}",
-						"events",
 						"comments"
 					],
 					"query": [
@@ -500,14 +497,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/comments?eventId={{event_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/comments?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"users",
 						"{{user_id}}",
-						"events",
 						"comments"
 					],
 					"query": [
@@ -550,14 +546,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/users/{{user_id}}/events/comments/{{comment_id}}?eventId={{event_id}}",
+					"raw": "{{base_url}}/users/{{user_id}}/comments/{{comment_id}}?eventId={{event_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"users",
 						"{{user_id}}",
-						"events",
 						"comments",
 						"{{comment_id}}"
 					],
